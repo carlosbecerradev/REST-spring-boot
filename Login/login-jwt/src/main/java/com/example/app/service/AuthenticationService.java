@@ -17,6 +17,8 @@ public class AuthenticationService {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	@Autowired
+	private JavaJWTService javaJwtService;
 
 	public ResponseEntity<?> login(LoginRequest loginRequest) {
 		try {
@@ -25,7 +27,7 @@ public class AuthenticationService {
 
 			SecurityContextHolder.getContext().setAuthentication(auth);
 
-			String jwt = "Soy.un.JSON.Web.Token";
+			String jwt = javaJwtService.generateJWTHMAC(auth);
 
 			return ResponseEntity.status(HttpStatus.OK).body(new AuthenticationResponse(auth.getName(), jwt));
 		} catch (Exception e) {
