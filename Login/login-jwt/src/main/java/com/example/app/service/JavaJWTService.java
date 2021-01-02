@@ -5,7 +5,10 @@ import java.security.Key;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -24,6 +27,24 @@ public class JavaJWTService {
 		String jwt = jws.compact();
 		
 		return jwt;
+	}
+	
+	public boolean validateJWT(String jwt) {
+		try {
+			getClaims(jwt);
+			return true;
+		} catch (JwtException | IllegalArgumentException  e) {			
+			return false;
+		}
+	}
+	
+	public Claims getClaims(String jwt) {
+		Jws<Claims> jws  = Jwts.parserBuilder()
+						.setSigningKey(this.key)
+						.build()
+						.parseClaimsJws(jwt);
+		
+		return jws.getBody();
 	}
 
 }
