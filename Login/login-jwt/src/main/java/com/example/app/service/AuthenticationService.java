@@ -19,6 +19,8 @@ public class AuthenticationService {
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private JavaJWTService javaJwtService;
+	@Autowired
+	private JavaJWTAsymmetricKeyService javaJwtASService;
 
 	public ResponseEntity<?> login(LoginRequest loginRequest) {
 		try {
@@ -27,7 +29,8 @@ public class AuthenticationService {
 
 			SecurityContextHolder.getContext().setAuthentication(auth);
 
-			String jwt = javaJwtService.generateJWTHMAC(auth);
+			// String jwt = javaJwtService.generateJWTHMAC(auth);
+			String jwt = javaJwtASService.generateJWT(auth);
 
 			return ResponseEntity.status(HttpStatus.OK).body(new AuthenticationResponse(auth.getName(), jwt));
 		} catch (Exception e) {
