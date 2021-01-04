@@ -7,5 +7,5 @@ import com.example.signup.entity.User;
 
 @Repository
 public interface IUserRepository extends CrudRepository<User, Long> {
-
+	boolean existsByUsername(String usernameString);
 }
