@@ -15,7 +15,7 @@ public class UserService {
 	private IUserRepository userRepository;
 
 	@Transactional
-	public void save(SignUpRequest signUpRequest) {
+	public boolean save(SignUpRequest signUpRequest) {
 		User user = mapToUser(signUpRequest);
 
 		if (isValidUsername(user.getUsername())) {
@@ -23,7 +23,9 @@ public class UserService {
 			user.setAuthority("USER_READONLY");
 
 			userRepository.save(user);
+			return true;
 		}
+		return false;
 	}
 
 	private User mapToUser(SignUpRequest signUpRequest) {
