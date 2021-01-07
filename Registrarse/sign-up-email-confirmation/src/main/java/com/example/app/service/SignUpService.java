@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.app.entity.EmailConfirmationToken;
 import com.example.app.entity.User;
 import com.example.app.pojo.NotificationEmail;
 import com.example.app.pojo.SignUpRequest;
+import com.example.app.repository.IEmailConfirmationTokenRepository;
 import com.example.app.repository.IUserRespository;
 
 @Service
@@ -14,6 +16,8 @@ public class SignUpService {
 
 	@Autowired
 	private IUserRespository userRepository;
+	@Autowired
+	private IEmailConfirmationTokenRepository ectRepository;
 	@Autowired
 	private EmailConfirmationService ecService;
 	@Autowired
@@ -48,4 +52,21 @@ public class SignUpService {
 		user.setPassword(signUpRequest.getPassword());
 		return user;
 	}
+
+	@Transactional(readOnly = true)
+	public void confirm(String token) {
+		EmailConfirmationToken ecToken = ectRepository.findByToken(token)
+				.orElseThrow(() -> new RuntimeException("Invalid Token"));
+		fetchUserAndEnable(ecToken);
+	}
+
+	@Transactional
+	private void fetchUserAndEnable(EmailConfirmationToken ecToken) {
+		Long id = ecToken.getUser().getId();
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("User not found wiht mail " + ecToken.getUser().getEmail()));
+		user.setEnabled(true);
+		userRepository.save(user);
+	}
+
 }
